@@ -1,0 +1,43 @@
+---
+- name: Ansible restart a service
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    # set default service to start or change it from cli
+    target_service: "sshd.service"
+    slack_webhook_token: ""
+  
+  tasks:
+  # restart service with service module
+  - name: Restart services
+    ansible.builtin.service:
+      name: "{{ target_service }}"
+      state: restarted
+    register: result
+    tags:
+      - setup
+  
+  # For debuging
+  - name: Print debug messages
+    ansible.builtin.debug:
+      var: result 
+      verbosity: 2
+    tags:
+      - setup
+
+  # print task run for audit trail
+  - name: Print service restart time stamp
+    ansible.builtin.debug:
+      msg: 
+      - "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
+    tags:
+      - setup
+  
+  # post message to Slack if web hook token available in env variable or AWX 's credtials
+  - name: Post message to Slack
+    slack:
+      token: "{{ slack_webhook_token }}"
+      msg: "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
+    no_log: True
+    when: slack_webhook_token != ""
