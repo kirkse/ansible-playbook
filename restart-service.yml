@@ -1,3 +1,13 @@
+#####
+# Run command - default to restart sssd.service
+# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, --ask-become
+# 
+# Run command to restart specific service - for example restart autofs.service
+# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, --extra-vars "target_service=autofs.service" --ask-become
+#
+# To post message to slack, export slack token to env variable then add extra-var to command line, 
+# for example: --extra-vars "slack_webhook_token=$SLACK_TOKEN"
+#####
 ---
 - name: Ansible restart a service
   hosts: all
@@ -25,19 +35,21 @@
       verbosity: 2
     tags:
       - setup
-
-  # print task run for audit trail
-  - name: Print service restart time stamp
-    ansible.builtin.debug:
-      msg: 
-      - "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
-    tags:
-      - setup
   
-  # post message to Slack if web hook token available in env variable or AWX 's credtials
+  # post message to Slack if web hook token available in env variable or AWX 's variables
   - name: Post message to Slack
     slack:
       token: "{{slack_webhook_token}}"
       msg: "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
-    #no_log: True
+    no_log: True
+    register: slack_posted
     when: slack_webhook_token != ""
+
+  # print task run to log for audit trail if we skip post message to slack
+  - name: Print service restart time stamp
+    ansible.builtin.debug:
+      msg: 
+      - "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
+    when: slack_posted is skipped
+    tags:
+      - setup
