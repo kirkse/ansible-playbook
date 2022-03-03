@@ -39,5 +39,5 @@
     slack:
       token: "{{ slack_webhook_token }}"
       msg: "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
-    no_log: True
+    #no_log: True
     when: slack_webhook_token != ""
