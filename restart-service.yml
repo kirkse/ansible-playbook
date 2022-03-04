@@ -15,9 +15,9 @@
   gather_facts: true
   vars:
     # set default service to start or change it from cli
-    target_service: "sshd.service"
+    target_service: "sssd.service"
     slack_webhook_token: ""
-  
+
   tasks:
   # restart service with service module
   - name: Restart services
@@ -27,15 +27,15 @@
     register: result
     tags:
       - setup
-  
+
   # For debuging
   - name: Print debug messages
     ansible.builtin.debug:
-      var: result 
+      var: result
       verbosity: 2
     tags:
       - setup
-  
+
   # post message to Slack if web hook token available in env variable or AWX 's variables
   - name: Post message to Slack
     slack:
@@ -44,11 +44,13 @@
     no_log: True
     register: slack_posted
     when: slack_webhook_token != ""
+    tags:
+      - setup
 
   # print task run to log for audit trail if we skip post message to slack
   - name: Print service restart time stamp
     ansible.builtin.debug:
-      msg: 
+      msg:
       - "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
     when: slack_posted is skipped
     tags:
