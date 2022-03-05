@@ -45,7 +45,8 @@
   - name: Post message to Slack
     slack:
       token: "{{ slack_webhook_token }}"
-      msg: "Service '{{ target_service }}' has been restarted at '{{ ansible_host }}' on '{{ ansible_date_time.iso8601 }}'"
+      msg: 
+        - "Service '{{ target_service }}' has been restarted at '{{ ansible_host }}' on '{{ ansible_date_time.iso8601 }}'"
     #no_log: True
     register: slack_posted
     when: slack_webhook_token != ""
