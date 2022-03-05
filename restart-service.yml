@@ -16,7 +16,7 @@
   vars:
     # set default service to start or change it from cli
     target_service: "sssd.service"
-    slack_webhook_token: ""
+    slack_webhook_token: "{{ slack_webhook }}"
 
   tasks:
   # restart service with service module
