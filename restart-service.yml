@@ -35,6 +35,11 @@
       verbosity: 2
     tags:
       - setup
+   
+  - name: print token
+    ansible.builtin.debug:
+      msg: 
+        - "This is the token {{slack_webhook_token}}"
 
   # post message to Slack if web hook token available in env variable or AWX 's variables
   - name: Post message to Slack
