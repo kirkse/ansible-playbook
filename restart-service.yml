@@ -39,13 +39,13 @@
   - name: print token
     ansible.builtin.debug:
       msg: 
-        - "This is the token '{{slack_webhook_token}}'"
+        - "This is the token '{{ slack_webhook_token }}'"
 
   # post message to Slack if web hook token available in env variable or AWX 's variables
   - name: Post message to Slack
     slack:
-      token: "{{slack_webhook_token}}"
-      msg: "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
+      token: "{{ slack_webhook_token }}"
+      msg: "Service '{{ target_service }}' has been restarted at '{{ ansible_host }}' on '{{ ansible_date_time.iso8601 }}'"
     #no_log: True
     register: slack_posted
     when: slack_webhook_token != ""
@@ -56,7 +56,7 @@
   - name: Print service restart time stamp
     ansible.builtin.debug:
       msg:
-      - "Service {{target_service}} has been restarted at {{ansible_host}} on {{ansible_date_time.iso8601}}"
+        - "Service '{{ target_service }}' has been restarted at '{{ ansible_host }}' on '{{ ansible_date_time.iso8601 }}'"
     when: slack_posted is skipped
     tags:
       - setup
