@@ -1,9 +1,9 @@
 #####
 # Run command - default to restart sssd.service
-# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, --ask-become
+# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, -K
 # 
 # Run command to restart specific service - for example restart autofs.service
-# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, --extra-vars "target_service=autofs.service" --ask-become
+# ansible-playbook ./playbooks/server-service-restart.yml -i <targetServer>, --extra-vars "target_service=autofs.service" -K
 #
 # To post message to slack, export slack token to env variable then add extra-var to command line, 
 # for example: --extra-vars "slack_webhook_token=$SLACK_TOKEN"
@@ -17,7 +17,7 @@
     # set default service to start or change it from cli
     target_service: "sssd.service"
     slack_webhook_token: ""
-
+  
   tasks:
   # restart service with service module
   - name: Restart services
@@ -27,15 +27,15 @@
     register: result
     tags:
       - setup
-
+  
   # For debuging
   - name: Print debug messages
     ansible.builtin.debug:
-      var: result
+      var: result 
       verbosity: 2
     tags:
       - setup
-      
+  
   # post message to Slack if web hook token available in env variable or AWX 's variables
   - name: Post message to Slack
     slack:
